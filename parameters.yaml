@@ -18,16 +18,48 @@ parameters:
     constraints:
       - allowed_values: [m1.small, m1.medium]
         description: InstanceType must be one of m1.small, m1.medium or m1.large
+  # user_name:
+  #   type: string
+  #   label: User Name
+  #   description: User name to be configured for the application
+  #   constraints:
+  #     - allowed_pattern: "[A-Z]+[a-zA-Z0-9]*"
+  #       description: User name must start with an uppercase character
+  # key_name:
+  #   type: string
+  #   description: SSH key pair
+  #   constraints:
+  #     - custom_constraint: clave_ale
 
 resources:
-  my_instance:
+  Instancia_de_prueba:
     type: OS::Nova::Server
     properties:
       key_name: clave_ale
       image: { get_param: image }
       # ImageId: { get_param: ImageId }
       flavor: {get_param: flavor}
+      # user_name: {get_param: user_name}
       networks: [{"network":"red de alejandro.nieto"}]
 
+
+outputs:
+  instance_ip:
+    description: IP address of the deployed compute instance
+    value: { get_attr: [my_instance , first_address] }
+
+# Ejemplo de dependencias entre resources:
+
+# En este caso el server1 depende de los server2 y 3
+# resources:
+#   server1:
+#     type: OS::Nova::Server
+#     depends_on: [ server2, server3 ]
+
+#   server2:
+#     type: OS::Nova::Server
+
+#   server3:
+#     type: OS::Nova::Server
 
 
