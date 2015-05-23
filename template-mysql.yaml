@@ -1,0 +1,31 @@
+heat_template_version: 2013-05-23
+
+description: Simple template to configure an instance with MySQL
+
+
+parameters:
+  DBRootPassword:
+    type: string
+    label: Database Password
+    description: Root password for MySQL
+    hidden: true
+
+resources:
+  my_instance:
+    type: OS::Nova::Server
+    properties:
+      key_name: clave_ale
+      image: Debian Jessie (stable)
+      flavor: m1.small
+      networks: [{"network":"red de alejandro.nieto"}]
+      # general properties ...
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash
+            echo "Hello world"
+            echo "Setting MySQL root password"
+            mysqladmin -u root password $db_rootpassword
+            # do more things ...
+          params:
+            $db_rootpassword: { get_param: DBRootPassword }
