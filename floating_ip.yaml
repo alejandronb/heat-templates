@@ -1,0 +1,33 @@
+heat_template_version: 2013-05-23
+
+description: Template para asociar IP flotante
+
+#Le pasamos el parámetro de la red privada.
+
+#En el siguiente paso se crea la ip flotante,luego la instancia, y luego se asocia esa IP con la instancia creada.
+
+parameters:
+   net:
+     description: name of network used to launch instance.
+     type: string
+     default: private
+
+resources:
+   inst1:
+     type: OS::Nova::Server
+     properties:
+       flavor: m1.small
+       image: Debian Jessie (stable)
+       networks:
+         - network: {get_param: net}
+
+   floating_ip:
+     type: OS::Neutron::FloatingIP
+     properties:
+       floating_network_id: "a86fc437-de50-4034-8e1a-f37a7b05537f"
+
+   association:
+     type: OS::Neutron::FloatingIPAssociation
+     properties:
+       floatingip_id: { get_resource: floating_ip }
+       port_id: {get_attr: [inst1, addresses, {get_param: net}, 0, port]}
