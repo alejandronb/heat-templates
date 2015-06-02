@@ -22,18 +22,14 @@ parameters:
     type: string
     default: clave_ale
     description: Clave SSH
-  # user_name:
-  #   type: string
-  #   label: User Name
-  #   description: User name to be configured for the application
-  #   constraints:
-  #     - allowed_pattern: "[A-Z]+[a-zA-Z0-9]*"
-  #       description: User name must start with an uppercase character
-  # key_name: 
-  #   type: string
-  #   description: SSH key pair
-  #   constraints:
-  #     - custom_constraint: clave_ale
+  user_name:
+    type: string
+    label: User Name
+    description: User name to be configured for the application
+    constraints:
+      - allowed_pattern: "[A-Z]+[a-zA-Z0-9]*"
+        description: El usuario debe empezar con mayuscula
+
 
 resources:
   Instancia_de_prueba:
@@ -41,9 +37,8 @@ resources:
     properties:
       key_name: {get_param: key_name}
       image: {get_param: image}
-      # ImageId: { get_param: ImageId }
       flavor: {get_param: flavor}
-      # user_name: {get_param: user_name}
+      admin_user: {get_param: user_name}
       networks: [{"network":"red de alejandro.nieto"}]
 
 
@@ -70,11 +65,15 @@ outputs:
 
 # Esto es lo ideal para definir la red en PARAMETERS y asociarle una IP flotante a una instancia:
 
+heat_template_version: 2013-05-23
+
+description: Simple template to deploy a single compute instance
+
 parameters:
-   net:
+   network:
      description: name of network used to launch instance.
      type: string
-     default: private
+     default: red de alejandro.nieto
 
  resources:
    inst1:
@@ -83,12 +82,12 @@ parameters:
        flavor: m1.small
        image: ubuntu-trusty-x86_64
        networks:
-         - network: {get_param: net}
+         - network: {get_param: network}
 
    floating_ip:
      type: OS::Neutron::FloatingIP
      properties:
-       floating_network: public
+       floating_network: ext-net
 
    association:
      type: OS::Neutron::FloatingIPAssociation
@@ -106,37 +105,3 @@ parameters:
        port_id: { get_resource: instance_port }
 
 
-
-# Parámetros como contrasennas de MySQL
-
-heat_template_version: 2013-05-23
-
-description: Simple template to deploy a single compute instance
-
-
-parameters:
-  DBRootPassword:
-    type: string
-    label: Database Password
-    description: Root password for MySQL
-    hidden: true
-
-resources:
-  my_instance:
-    type: OS::Nova::Server
-    properties:
-      key_name: clave_ale
-      image: Debian Jessie (stable)
-      flavor: m1.small
-      networks: [{"network":"red de alejandro.nieto"}]
-      # general properties ...
-      user_data:
-        str_replace:
-          template: |
-            #!/bin/bash
-            echo "Hello world"
-            echo "Setting MySQL root password"
-            mysqladmin -u root password $db_rootpassword
-            # do more things ...
-          params:
-            $db_rootpassword: { get_param: DBRootPassword }
