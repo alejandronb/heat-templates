@@ -1,0 +1,21 @@
+heat_template_version: 2013-05-23
+
+description: Template de ejemplo para utilizar Heat con Ansible
+
+
+resources:
+  the_resource:
+    type: OS::Cinder::Volume
+    properties:
+      availability_zone: String
+      backup_id: String
+      description: String
+      image: String
+      # metadata: {...}
+      name: String
+      # read_only: Boolean Available since Liberty
+      # scheduler_hints: {...}
+      size: Integer
+      snapshot_id: String
+      source_volid: String
+      volume_type: String
