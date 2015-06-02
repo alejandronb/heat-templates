@@ -35,11 +35,37 @@ resources:
   Instancia_de_prueba:
     type: OS::Nova::Server
     properties:
+      name: Debian
       key_name: {get_param: key_name}
       image: {get_param: image}
       flavor: {get_param: flavor}
       admin_user: {get_param: user_name}
       networks: [{"network":"red de alejandro.nieto"}]
+
+  volumen:
+    type: OS::Cinder::Volume
+    properties:
+      availability_zone: nova
+      # backup_id: String
+      # description: String
+      # image: Debian Jessie (stable)
+      # metadata: {...}
+      name: volume_debian
+      # read_only: Boolean Available since Liberty
+      # scheduler_hints: {...}
+      size: 2
+      # snapshot_id: String
+      # source_volid: String
+      # volume_type: String
+      # imageRef: 
+
+  asignacion:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid: { Ref: Instancia_de_prueba }
+      mountpoint: /dev/vdc
+      volume_id: { Ref: volumen }
+
 
 
 outputs:
