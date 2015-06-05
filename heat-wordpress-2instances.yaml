@@ -6,6 +6,10 @@ description: >
   or blog. This template installs two instances: one running a
   WordPress deployment and the other using a local MySQL database to
   store the data.
+
+  Falta configurar fichero de configuración de Wordpress para que utilice
+  la dirección IP del servidor de base de datos. 
+  Cambiar manera de obtención de IP
 parameters:
 
   key_name:
