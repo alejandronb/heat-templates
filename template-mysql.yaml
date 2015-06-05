@@ -3,6 +3,110 @@ heat_template_version: 2013-05-23
 description: Simple template to configure an instance with MySQL
 
 
+# parameters:
+#   DBRootPassword:
+#     type: string
+#     label: Database Password
+#     description: Root password for MySQL
+#     hidden: true
+
+
+components:
+  install_mysql:
+    type: Heat::SoftwareConfig
+    config:
+      packages:
+        yum:
+          mysql: []
+          mysql-server: []
+      services:
+        systemd:
+          mysqld: {enabled: 'true', ensureRunning: 'true'}
+
+
+
+
+resources:
+  my_instance:
+    type: OS::Nova::Server
+    properties:
+      key_name: clave_ale
+      image: Debian Jessie (stable)
+      flavor: m1.small
+      networks: [{"network":"red de alejandro.nieto"}]
+      components:
+      - name: install_mysql
+      # - name: install_wordpress
+      # - name: foo_file
+      # general properties ...
+      # user_data:
+      #   str_replace:
+      #     template: |
+      #       #!/bin/bash
+      #       echo "Hello world"
+      #       echo "Setting MySQL root password"
+      #       mysqladmin -u root password $db_rootpassword
+      #       # do more things ...
+      #     params:
+      #       $db_rootpassword: { get_param: DBRootPassword }
+
+
+
+
+
+
+components:
+  install_mysql:
+    type: Heat::SoftwareConfig
+    config:
+      packages:
+        yum:
+          mysql: []
+          mysql-server: []
+      services:
+        systemd:
+          mysqld: {enabled: 'true', ensureRunning: 'true'}
+  install_wordpress:
+    type: Heat::SoftwareConfig
+    config:
+      packages:
+        yum:
+          httpd: []
+          wordpress: []
+      services:
+        systemd:
+          httpd: {enabled: 'true', ensureRunning: 'true'}
+  foo_file:
+    type: Heat::SoftwareConfig
+    config:
+      files:
+        /tmp/foo/bar:
+          content: 'foo_bar_contents'
+...
+resources:
+  the_server:
+    type: OS::Nova::Server
+    properties:
+      components:
+      - name: install_mysql
+      - name: install_wordpress
+      - name: foo_file
+        params:         
+          foo_bar_contents:
+            get_param: the_file_contents
+
+
+
+
+
+
+# Parámetros como contrasennas de MySQL
+
+heat_template_version: 2013-05-23
+
+description: Simple template to deploy a single compute instance
+
+
 parameters:
   DBRootPassword:
     type: string
