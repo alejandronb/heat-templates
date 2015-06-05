@@ -29,10 +29,7 @@ parameters:
     type: string
     description: >
       Name or ID of the image to use for the WordPress server.
-      Recommended values are fedora-20.i386 or fedora-20.x86_64;
-      get them from http://cloud.fedoraproject.org/fedora-20.i386.qcow2
-      or http://cloud.fedoraproject.org/fedora-20.x86_64.qcow2 .
-    default: fedora-20.x86_64
+    default: Fedora 20
 
   db_name:
     type: string
