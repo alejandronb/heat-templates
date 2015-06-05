@@ -1,0 +1,37 @@
+heat_template_version: 2013-05-23
+
+description: Template de ejemplo para utilizar Heat con Ansible
+
+components:
+  the_component:
+    type: Heat::Ansible
+    config:
+      user: root
+      tasks:
+      - name: ensure apache is at the latest version
+        yum: pkg=httpd state=latest
+      - name: write the apache config file
+        template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+        notify:
+        - restart apache
+      - name: ensure apache is running
+        service: name=httpd state=started
+      handlers:
+        - name: restart apache
+          service: name=httpd state=restarted
+
+resources:
+  instance:
+    type: OS::Nova::Server
+    properties:
+      key_name: clave_ale
+      image: Fedora 20
+      flavor: m1.small
+      networks: [{"network":"red de alejandro.nieto"}]
+      components:
+      - name: the_component
+        params:         
+          http_port:
+            get_param: apache_port
+          max_clients: 
+            get_param: max_clients
