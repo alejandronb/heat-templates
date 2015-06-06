@@ -1,0 +1,13 @@
+heat_template_version: 2013-05-23
+
+resources:
+  the_resource:
+    type: OS::Glance::Image
+    properties:
+      container_format: ova
+      disk_format: qcow2
+      is_public: True
+      # location: String
+      min_disk: Integer
+      min_ram: Integer
+      name: Debian
