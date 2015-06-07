@@ -111,6 +111,7 @@ resources:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network_id: "a86fc437-de50-4034-8e1a-f37a7b05537f"
+      # floating_network: "ext-net" Así sería en Juno
 
   association:
     type: OS::Neutron::FloatingIPAssociation
