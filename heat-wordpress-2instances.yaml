@@ -137,6 +137,29 @@ resources:
             db_password: { get_param: db_password }
             db_ipaddr: { get_attr: [DatabaseServer, networks, private, 0] }
 
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: "a86fc437-de50-4034-8e1a-f37a7b05537f"
+
+  floating_ip_1:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: "a86fc437-de50-4034-8e1a-f37a7b05537f"
+
+  association:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: floating_ip }
+      port_id: {get_attr: [DatabaseServer, addresses, "red de alejandro.nieto", 0, port]}
+
+  association_1:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: floating_ip_1}
+      port_id: {get_attr: [WebServer, addresses, "red de alejandro.nieto", 0, port]}
+
 outputs:
   WebsiteURL:
     description: URL for Wordpress wiki
