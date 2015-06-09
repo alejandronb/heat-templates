@@ -1,37 +1,112 @@
 heat_template_version: 2013-05-23
 
-description: Template de ejemplo para utilizar Heat con Ansible
+description: Simple template to deploy a single compute instance
 
-components:
-  the_component:
-    type: Heat::Ansible
-    config:
-      user: root
-      tasks:
-      - name: ensure apache is at the latest version
-        yum: pkg=httpd state=latest
-      - name: write the apache config file
-        template: src=/srv/httpd.j2 dest=/etc/httpd.conf
-        notify:
-        - restart apache
-      - name: ensure apache is running
-        service: name=httpd state=started
-      handlers:
-        - name: restart apache
-          service: name=httpd state=restarted
+parameters:
+  image:
+    type: string
+    description: Image ID or image name to use for the server4
+    default: Debian Jessie (stable)
+    constraints:
+      - allowed_values: 
+        - Debian Jessie (stable)
+        - Fedora 20
+  flavor:
+    type: string
+    description: Sabor de la instancia
+    default: m1.small
+    constraints:
+      - allowed_values: [m1.small, m1.medium]
+        description: InstanceType must be one of m1.small, m1.medium or m1.large
+  key_name:
+    type: string
+    default: clave_ale
+    description: Clave SSH
+  paquete:
+    type: string
+    default: ansible
 
 resources:
-  instance:
+  Instancia_Ansible:
     type: OS::Nova::Server
     properties:
-      key_name: clave_ale
-      image: Fedora 20
-      flavor: m1.small
+      name: Debian
+      key_name: {get_param: key_name}
+      image: {get_param: image}
+      flavor: {get_param: flavor}
       networks: [{"network":"red de alejandro.nieto"}]
-      components:
-      - name: the_component
-        params:         
-          http_port:
-            get_param: apache_port
-          max_clients: 
-            get_param: max_clients
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y aptitude package
+          params:
+            package: { get_param: paquete}
+      user_data_format: SOFTWARE_CONFIG
+
+  config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ansible
+      inputs:
+      - name: foo
+      - name: bar
+      outputs:
+      - name: result
+      config: 
+        # get_file: https://raw.githubusercontent.com/openstack/heat-templates/master/hot/software-config/example-templates/config-scripts/example-ansible-template.ansible
+        get_file: template-ansible.yaml
+
+  deployment:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: config
+      server:
+        get_resource: Instancia_Ansible
+      input_values:
+        foo: fooooo
+        bar: baaaaa
+
+  # other_deployment:
+  #   type: OS::Heat::SoftwareDeployment
+  #   properties:
+  #     config:
+  #       get_resource: config
+  #     server:
+  #       get_resource: server
+  #     input_values:
+  #       foo: fu
+  #       bar: barmy
+  #     actions:
+  #     - CREATE
+  #     - UPDATE
+  #     - SUSPEND
+  #     - RESUME
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      image: {get_param: image}
+      flavor: {get_param: flavor}
+      key_name: {get_param: key_name}
+      user_data_format: SOFTWARE_CONFIG
+
+outputs:
+  result:
+    value:
+      get_attr: [deployment, result]
+  stdout:
+    value:
+      get_attr: [deployment, deploy_stdout]
+  stderr:
+    value:
+      get_attr: [deployment, deploy_stderr]
+  status_code:
+    value:
+      get_attr: [deployment, deploy_status_code]
+  other_result:
+    value:
+      get_attr: [other_deployment, result]
