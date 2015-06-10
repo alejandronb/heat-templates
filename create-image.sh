@@ -1,5 +1,4 @@
-  # Clone the required repositories. Some of these are also available
-  # via pypi or as distro packages.
+#  Script para la creación de una imagen personalizada de Fedora con ansible, puppet...
 git clone https://git.openstack.org/openstack/diskimage-builder.git
 git clone https://git.openstack.org/openstack/tripleo-image-elements.git
 git clone https://git.openstack.org/openstack/heat-templates.git
