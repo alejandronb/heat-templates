@@ -4,7 +4,7 @@ resources:
   the_resource:
     type: OS::Glance::Image
     properties:
-      container_format: ova
+      container_format: bare
       disk_format: qcow2
       is_public: True
       # location: String
